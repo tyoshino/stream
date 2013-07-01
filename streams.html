@@ -17,17 +17,28 @@
 
 <h1>Streams with Promises</h1>
 
+<h3>Abstract</h3>
+
+<p>This document proposes integration of <a href="http://dom.spec.whatwg.org/#promises">DOM Promises</a> and <a href="https://dvcs.w3.org/hg/streams-api/raw-file/tip/Overview.htm">Streams API</a>.
+
 </div>
 
 <!--toc-->
+
+<h3>Streams Model</h3>
+
+<p>A <dfn title=concept-stream>stream</dfn> represents a data sources for which the total size is unknown until EOF is reached. Data queued to a stream is read in FIFO order. Data pushed to a stream can be read out only once from it.
+
+<p>A <span title=concept-stream>stream</span> has associated
+<dfn title=concept-stream-read-position>read position</dfn> and
+<dfn title=concept-stream-read-promise>read promise</dfn> and
+...
 
 <h3>Streams API</h3>
 
 <pre class=idl>interface <dfn>Stream</dfn> {
   AbortableProgressPromise&lt;ArrayBuffer&gt; <span title=dom-Stream-read>read</span>(optional unsigned long long <var title>size</var>);
 };</pre>
-
-<h3>Streams Model</h3>
 
 <p>A <span title=concept-stream>stream</span>'s <dfn title=dom-Stream-read><code>read(<var>maxSize</var>)</code></dfn> method takes optionally a <var title>maxSize</var>, and runs these steps:
 
