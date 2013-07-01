@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en-US">
+ <head>
+  <meta charset=UTF-8>
+  <title>Streams with Promises</title>
+  <style>
+   @media print {
+     [data-anolis-spec]::after { content:"[" attr(data-anolis-spec) "]"; font-size:.6em; vertical-align:super; text-transform:uppercase }
+   }
+  </style>
+  <link rel=stylesheet href=http://www.whatwg.org/style/specification>
+  <link rel=icon href=//resources.whatwg.org/logo-dom.svg>
+ </head>
+ <body>
+
+<div class=head>
+
+<h1>Streams with Promises</h1>
+
+</div>
+
+<!--toc-->
+
+<h3>Streams API</h3>
+
+<pre class=idl>interface <dfn>Stream</dfn> {
+  AbortableProgressPromise&lt;ArrayBuffer&gt; <span title=dom-Stream-readAsArrayBuffer>readAsArrayBuffer</span>(optional unsigned long long <var title>size</var>);
+};</pre>
+
+<h3>Streams Model</h3>
+
+<p>A <span title=concept-stream>stream</span>'s <dfn title=dom-Stream-readAsArrayBuffer><code>readAsArrayBuffer(<var>maxSize</var>)</code></dfn> method takes optionally a <var title>maxSize</var>, and runs these steps:
+
+<ol>
+ <li>If has been neutered or the <span title=concept-stream-read-position>read posision</span> is -1, throw an InvalidStateError exception and terminate this algorithm.
+ <li>Let <var>read promise</var> be a new <span title=concept-abortable-progress-promise>abortable progress promise</span> of the <span title=concept-array-buffer>array buffer</span> and <var>read resolver</var> be <var>read promise</var>'s associated <span title=concept-resolver>resolver</span>.
+ <li>Let <var>pos</var> be the <span title=concept-stream>stream</span>'s <span title=concept-stream-read-position>read position</span>.
+ <li>If called with the optional <var>maxSize</var>, set the <span title=concept-stream>stream</span>'s <span title=concept-stream-read-position>read position</span> to <var>pos</var> + <var>maxSize</var>.
+ <li>Otherwise, set the <span title=concept-stream>stream</span>'s <span title=concept-stream-read-position>read position</span> to -1.
+ <li>Append <var>read resolver</var> to <span title=concept-stream-pending-read-resolvers>pending read resolvers</span>.
+ <li>Return the <span title=dom-Stream-readAsArrayBuffer>readAsArrayBuffer()</span> method with <var>promise</var>, but continue to process the steps in this algorithm.
+ <li>Read data from <var>pos</var> up to <var>maxSize</var> bytes or all data from <var>pos</var> if <var>maxSize</var> is not specified.
+ <li>As data from the stream becomes available, do the following,
+  <ol>
+   <li>Let <var>buffer</var> be an <span title=concept-array-buffer>array buffer</span> created from the read data.
+   <li>User agents should release resource for storing the read data other than <var>buffer</var>.
+   <li>If any error has occurred, call <span title=dom-PromiseResolver-reject>reject</span> of <var>read resolver</var> with a <span title=dom-DOMError>DOMError</span> object that indicates the kind of stream error that has occurred, and terminate this algorithm.
+   <li>Call <span title=dom-AbortableProgressPromiseResolver-progress>progress</span> of <var>read resolver</var> with <var>buffer</var>.
+   <li>If the end of data is reached or finished reading <var>maxSize</var> bytes, call <span title=dom-AbortableProgressPromiseResolver-fulfill>fulfill</span> of <var>read resolver</var> and terminate this algorithm.
+  </ol>
+</ol>
